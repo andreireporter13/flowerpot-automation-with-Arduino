@@ -22,17 +22,32 @@
 // air: humidity and temeprature
 #define DHTPIN 2          // pinul digital la care e conectat senzorul
 #define DHTTYPE DHT11     // tipul de senzor utilizat (pot fi DHT11, DHT21 sau DHT22)
+DHT dht(DHTPIN, DHTTYPE);
 
 // earth humidity
 #define EARTH_SENSOR A0
 
-// 
+// Water sensor
+#define WATER_SENSOR A1
 
-DHT dht(DHTPIN, DHTTYPE);
+// leds
+#define GREEN_LED 13  // if temperature is ok, it will be blinked permanent
+#define RED_LED 12    // if no water in bol, blink
+#define BLUE_LED 8    // if earth haven't water, will be blinked
+
+// rele define here
+#define WATER_POMP 3
 
 void setup() {
   
   pinMode(EARTH_SENSOR, INPUT);
+  pinMode(WATER_SENSOR, INPUT);
+
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
+
+  pinMode(WATER_POMP, OUTPUT);
   
   Serial.begin(9600);
   dht.begin();
@@ -45,7 +60,10 @@ void loop() {
   float temperature = dht.readTemperature();
 
   // value for earth humidity senzor
-  int senzor_EARTH = analogRead(EARTH_SENSOR)
+  int senzor_EARTH = analogRead(EARTH_SENSOR);
+
+  // water volum
+  int sensor_WATER = analogRead(WATER_SENSOR);
 
   // Temperature and humidity - air
   Serial.print("Temperatura: ");
