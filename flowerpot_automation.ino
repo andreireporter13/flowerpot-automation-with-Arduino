@@ -33,7 +33,7 @@ void loop() {
 
     unsigned long current_time = millis();
 
-    // time to check if spent 24 hours
+    // time to check if spent 24 hours
     if (current_time - previousMillis >= interval) {
         previousMillis = current_time;
 
