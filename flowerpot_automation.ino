@@ -9,7 +9,7 @@ const int water_pump_pin = 6;
 const int soil_sensor_pin = A0;
 const int water_level_pin = A1;
 
-// interval for water pump
+// interval for check if need water pump
 unsigned long previousMillis = 0;
 const unsigned long interval = 24 * 3600 * 1000; // 24 hours in milliseconds
 
@@ -26,9 +26,6 @@ void setup() {
     pinMode(water_level_pin, INPUT);
   
     pinMode(led_builtin_pin, OUTPUT);
-
-    // test
-    Serial.begin(9600);
 }
 
 
@@ -36,7 +33,7 @@ void loop() {
 
     unsigned long current_time = millis();
 
-    // time to check if spent 3 hours
+    // time to check if spent 24 hours
     if (current_time - previousMillis >= interval) {
         previousMillis = current_time;
 
@@ -50,7 +47,7 @@ void loop() {
             // request for water
             while (water_data_level <= 200) {
 
-                // set alerg blink sound
+                // set alert blink sound
                 alert_blink_sound();
 
                 water_data_level = analogRead(water_level_pin);
