@@ -1,80 +1,84 @@
 /*
-                   #########################
-      Project ---> Automation Flower v.0.1.0 ---> Arduino UNO R3 + C/C++
-                   #########################
-                   
-      Needs: --> Flower, 
-                 Arduino UNO, 
-                 Moisture Sensor, 
-                 Water Level Sensor,
-                 Water Pump, 
-                 Water Hose etc.
-                 
-      ---> Idea: This is a complete automated flower assistant. If the flower 
-                 does not have water, Arduino will send water to the flowerpot. 
-                 If there is no water in the water hose, Arduino will send a 
-                 message to the mobile phone. If it is very cold, Arduino will 
-                 also send a message."
- */
+  New project -> Arduino
+  ...
+  -> Flowerpot automation v.1.0
+*/
 
-#include <DHT.h>
+// Define pin for sensors:
+const int water_pump_pin = 6;
+const int soil_sensor_pin = A0;
+const int water_level_pin = A1;
 
-// air: humidity and temeprature
-#define DHTPIN 2          // pinul digital la care e conectat senzorul
-#define DHTTYPE DHT11     // tipul de senzor utilizat (pot fi DHT11, DHT21 sau DHT22)
-DHT dht(DHTPIN, DHTTYPE);
+// interval for water pump
+unsigned long previousMillis = 0;
+const unsigned long interval = 24 * 3600 * 1000; // 24 hours in milliseconds
 
-// earth humidity
-#define EARTH_SENSOR A0
+// Builtin led need for pulse :))
+const int led_builtin_pin = LED_BUILTIN;
 
-// Water sensor
-#define WATER_SENSOR A1
-
-// leds
-#define GREEN_LED 13  // if temperature is ok, it will be blinked permanent
-#define RED_LED 12    // if no water in bol, blink
-#define BLUE_LED 8    // if earth haven't water, will be blinked
-
-// rele define here
-#define WATER_POMP 3
 
 void setup() {
   
-  pinMode(EARTH_SENSOR, INPUT);
-  pinMode(WATER_SENSOR, INPUT);
+    pinMode(water_pump_pin, OUTPUT);
 
-  pinMode(GREEN_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
-  pinMode(BLUE_LED, OUTPUT);
-
-  pinMode(WATER_POMP, OUTPUT);
+    // set analog pins ---> !
+    pinMode(soil_sensor_pin, INPUT);
+    pinMode(water_level_pin, INPUT);
   
-  Serial.begin(9600);
-  dht.begin();
+    pinMode(led_builtin_pin, OUTPUT);
+
+    // test
+    Serial.begin(9600);
 }
+
 
 void loop() {
 
-  // air: humidity and temperature senzor Value
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
+    unsigned long current_time = millis();
 
-  // value for earth humidity senzor
-  int senzor_EARTH = analogRead(EARTH_SENSOR);
+    // time to check if spent 3 hours
+    if (current_time - previousMillis >= interval) {
+        previousMillis = current_time;
 
-  // water volum
-  int sensor_WATER = analogRead(WATER_SENSOR);
+        // here read the values of sensors
+        int soil_data_sensor = analogRead(soil_sensor_pin);
+        int water_data_level = analogRead(water_level_pin);
 
-  // Temperature and humidity - air
-  Serial.print("Temperatura: ");
-  Serial.print(temperature);
-  Serial.print("°C | Umiditate: ");
-  Serial.print(humidity);
-  Serial.println("%");
+        // check for human interaction
+        if (water_data_level <= 200 && soil_data_sensor <= 10) {
 
-  // earth sensor value
-  Serial.print("Valoare senzor: ");
-  Serial.println(sensorValue);
+            // request for water
+            while (water_data_level <= 200) {
 
-  delay(2000); // așteptăm 2 secunde până la o nouă citire
+                // set alerg blink sound
+                alert_blink_sound();
+
+                water_data_level = analogRead(water_level_pin);
+
+                // set sleep
+                delay(3000);
+            }
+        }
+        else if (water_data_level > 200 && soil_data_sensor <= 10) {
+            pump_with_water();
+        }
+    }
+}
+
+
+void alert_blink_sound() {
+  digitalWrite(led_builtin_pin, HIGH);
+  delay(300);
+  digitalWrite(led_builtin_pin, LOW);
+  delay(300);
+
+  // plus, in future, add and buzzer here
+}
+
+
+void pump_with_water() {
+    digitalWrite(water_pump_pin, HIGH);
+    delay(4000);
+    digitalWrite(water_pump_pin, LOW);
+    delay(1500);
 }
