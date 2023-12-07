@@ -1,5 +1,7 @@
 # Arduino - Flowerpot Automation
 
+![Arduino Automation](./media/flower-pot-with-arduino.jpg)
+
 ## About
 
 Automation project for the automated flowerpot!
@@ -12,7 +14,7 @@ Instrucțiuni despre cum să obțineți o copie a proiectului și să începeți
 
 ## Instalare
 ```bash
-git clone https://github.com/nume-utilizator/nume-proiect.git
-cd nume-proiect
+git clone https://github.com/andreireporter13/flowerpot-automation-with-Arduino
+cd flowerpot-automation-with-Arduino
 ```
 Si de aici puteti incepe sa testati si dvs.
