@@ -42,7 +42,7 @@ void setup() {
   pinMode(WATER_PUMP, OUTPUT);
 
   // ... PWM
-  pinMode(BUZZER, OUTPUT);
+  //pinMode(BUZZER, OUTPUT);
   pinMode(RGB_RED, OUTPUT);
   pinMode(RGB_GREEM, OUTPUT);
   pinMode(RGB_BLUE, OUTPUT);
@@ -52,51 +52,24 @@ void setup() {
 
 void loop() {
 
-   unsigned long current_time = millis() / (1000UL * 3600UL * 24UL);
+  // count days
+  unsigned long current_time = millis();
+  int current_days = current_time / (1000UL * 3600UL * 24UL);
 
-    // time to check if spent 24 hours
-    if (current_time - previousMillis >= interval) {
-        previousMillis = current_time;
+  // this function will be blinked led forever
+  heart_beat_led(current_time);
+  
+}
 
-        // here read the values of sensors
-        int soil_data_sensor = analogRead(soil_sensor_pin);
-        int water_data_level = analogRead(water_level_pin);
 
-        // check for human interaction
-        if (water_data_level <= 200 && soil_data_sensor <= 10) {
+void heart_beat_led(unsigned long time) {
+  if (time - heart_beat_previous >= heart_beat_interval) {
+    heart_beat_previous = time;
 
-            // request for water
-            while (water_data_level <= 200) {
-
-                // set alert blink sound
-                alert_blink_sound();
-
-                water_data_level = analogRead(water_level_pin);
-
-                // set sleep
-                delay(3000);
-            }
-        }
-        else if (water_data_level > 200 && soil_data_sensor <= 10) {
-            pump_with_water();
-        }
+    if (digitalRead(13) == LOW) {
+      digitalWrite(13, HIGH);
+    } else {
+      digitalWrite(13, LOW);
     }
-}
-
-
-void alert_blink_sound() {
-  digitalWrite(led_builtin_pin, HIGH);
-  delay(300);
-  digitalWrite(led_builtin_pin, LOW);
-  delay(300);
-
-  // plus, in future, add and buzzer here
-}
-
-
-void pump_with_water() {
-    digitalWrite(water_pump_pin, HIGH);
-    delay(4000);
-    digitalWrite(water_pump_pin, LOW);
-    delay(1500);
+  }
 }
